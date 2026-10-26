@@ -1,0 +1,1 @@
+{"name":"growth-measurement-lab","version":"1.0.0","private":true,"type":"module","description":"Reconcile form attempts, successful submissions and CRM contacts without confusing their denominators.","scripts":{"test":"node --test","demo":"node demo.mjs"},"engines":{"node":">=20"},"license":"MIT"}
