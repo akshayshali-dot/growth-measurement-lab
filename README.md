@@ -63,6 +63,20 @@ The library reports discrepancies; it does not diagnose their cause. In the synt
 
 ## Further context
 
+### Search indexing evidence example
+
+`index-evidence.mjs` reconciles an anonymised, frozen intended-page inventory against one engine's supplied status snapshot. It keeps variants outside the denominator, rejects duplicate or unmatched keys, and treats missing observations as unknown. Run `node --test` to check the synthetic 100-page example and validation cases.
+
+```js
+import { summarizeIndexEvidence } from './index-evidence.mjs';
+const inventory = [{key:'page_1',kind:'intended'}, {key:'page_2',kind:'intended'}, {key:'alias_1',kind:'variant'}];
+const evidence = [{key:'page_1',status:'indexed'}];
+console.log(summarizeIndexEvidence(inventory, evidence));
+// 1 indexed, 1 unknown; confirmed 50%, observed 50%, possible upper 100%.
+```
+
+Use stable opaque keys and keep URLs or customer data in your own access-controlled system. Ensure the engine, property, dates and inventory version match before calling the function. A URL missing from a limited report is unknown, not confirmed excluded. The possible range reflects missing classification only; it is not a confidence interval, indexing prediction or measure of rankings. Technical HTTP eligibility and submission confirmation are separate evidence. The [indexing guide](https://growth-marketing-consultant.com/blog/search-indexing-coverage-without-misleading-totals) explains the method and limitations; [Google's Page indexing documentation](https://support.google.com/webmasters/answer/7440203?hl=en) describes the underlying report. This is original code with synthetic data, created with AI assistance.
+
 My [forward-deployed marketing work](https://growth-marketing-consultant.com/services/forward-deployed-marketer) covers APIs, analytics, monitoring and operational workflows. This repository is an educational implementation example, not evidence of a particular client's results.
 
 ## Contributing
