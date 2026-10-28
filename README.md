@@ -63,6 +63,21 @@ The library reports discrepancies; it does not diagnose their cause. In the synt
 
 ## Further context
 
+### AI lead-agent handoff decision example
+
+`agent-handoff.mjs` is a small deterministic next-step example for a proposed AI-to-CRM handoff. It accepts only a synthetic, opaque event ID and policy states supplied by the caller. It makes no model calls, retains no customer information and performs no CRM writes. Run `node --test` to exercise the example and existing reconciliation checks.
+
+```js
+import { nextHandoffAction } from './agent-handoff.mjs';
+const next = nextHandoffAction({
+  eventId: 'syn_001', replyBasis: 'approved', identity: 'matched',
+  writeState: 'unknown', humanRequested: false,
+});
+// { action: 'reconcile', reason: 'write_outcome_unknown' }
+```
+
+An uncertain write must be reconciled before another write is considered. A confirmed write still needs owner verification; a failed write, a human request or an unresolved identity requires review when the policy allows a reply. A denied reply is held. These are example decisions, not a legal permission assessment or evidence that a particular integration has been deployed. A production adapter needs source authentication, access controls, durable records, a monitored review queue and provider-specific error handling. The [AI lead-agent and CRM handoff guide](https://growth-marketing-consultant.com/blog/ai-lead-agents-crm-handoff-qualification) explains the wider design. This example is original, synthetic and developed with AI assistance.
+
 ### Search indexing evidence example
 
 `index-evidence.mjs` reconciles an anonymised, frozen intended-page inventory against one engine's supplied status snapshot. It keeps variants outside the denominator, rejects duplicate or unmatched keys, and treats missing observations as unknown. Run `node --test` to check the synthetic 100-page example and validation cases.
