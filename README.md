@@ -63,6 +63,10 @@ The library reports discrepancies; it does not diagnose their cause. In the synt
 
 ## Further context
 
+### Marketing Workflow Architect companion
+
+The [lead-routing walkthrough and runnable example](lead-routing/README.md) turns a demo request into explicit assignment, review and reconciliation decisions. It extends the handoff rule below with a field contract, duplicate/conflicting-event checks, owner preservation and a known-answer synthetic cohort. Run `node lead-routing/demo.mjs` and `node --test`. It makes no API calls and needs no credentials.
+
 ### AI lead-agent handoff decision example
 
 `agent-handoff.mjs` is a small deterministic next-step example for a proposed AI-to-CRM handoff. It accepts only a synthetic, opaque event ID and policy states supplied by the caller. It makes no model calls, retains no customer information and performs no CRM writes. Run `node --test` to exercise the example and existing reconciliation checks.

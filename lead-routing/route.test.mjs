@@ -1,0 +1,17 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { planHandoffs } from './route.mjs';
+import { sample, fixtures } from './fixtures.mjs';
+const decision = overrides => planHandoffs([sample(overrides)]).decisions[0];
+test('known-answer cohort deduplicates without inventing outcomes',()=>{ const r=planHandoffs(fixtures);assert.equal(r.inputRows,7);assert.equal(r.uniqueEvents,6);assert.equal(r.duplicateRows,1);assert.deepEqual(r.counts,{ready_for_adapter:2,hold:1,review:1,reconcile:1,verify_owner:0,acknowledged:1}); });
+test('preserves existing owner over routing fallback',()=>assert.equal(decision({ownerId:'owner_existing'}).ownerId,'owner_existing'));
+test('missing owner goes to review',()=>assert.equal(decision({routeOwnerId:null}).reason,'no_owner_available'));
+test('unknown write requires reconciliation even with denied reply',()=>assert.equal(decision({writeState:'unknown',replyBasis:'denied'}).action,'reconcile'));
+test('confirmed write does not invent owner acknowledgement',()=>assert.equal(decision({writeState:'confirmed',ownerId:'owner_demo'}).action,'verify_owner'));
+test('confirmed unowned handoff stays unassigned',()=>assert.equal(decision({writeState:'confirmed'}).reason,'owner_missing'));
+test('ambiguous identity and human request require review',()=>{assert.equal(decision({identity:'ambiguous'}).action,'review');assert.equal(decision({humanRequested:true}).action,'review');});
+test('failed write cannot be automatically retried',()=>assert.equal(decision({writeState:'failed'}).action,'review'));
+test('unknown permission is not inferred',()=>assert.equal(decision({replyBasis:'unknown'}).action,'review'));
+test('conflicting duplicate fails closed regardless of ordering',()=>{const a=sample({}),b=sample({source:'paid'});assert.throws(()=>planHandoffs([a,b]),/Conflicting/);assert.throws(()=>planHandoffs([b,a]),/Conflicting/);});
+test('rejects missing fields, extra data, invalid ID and impossible acknowledgement',()=>{const missing=sample({});delete missing.source;for(const row of [missing,sample({email:'synthetic@example.invalid'}),sample({eventId:''}),sample({ownerAcknowledged:true}),sample({source:'guessed'})]) assert.throws(()=>planHandoffs([row]));});
+test('empty cohort is empty and input is unchanged',()=>{assert.equal(planHandoffs([]).uniqueEvents,0);const before=JSON.stringify(fixtures);planHandoffs(fixtures);assert.equal(JSON.stringify(fixtures),before);assert.throws(()=>planHandoffs(Array(10001).fill(sample({}))));});

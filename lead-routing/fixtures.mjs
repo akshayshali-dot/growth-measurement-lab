@@ -1,0 +1,3 @@
+const base = {replyBasis:'approved',identity:'new',writeState:'not_started',humanRequested:false,ownerId:null,routeOwnerId:'owner_demo',ownerAcknowledged:false,source:'unknown'};
+export const sample = overrides => ({...base,eventId:'syn_001',...overrides});
+export const fixtures = [sample({source:'organic'}),sample({source:'organic'}),sample({eventId:'syn_002',identity:'matched',ownerId:'owner_existing'}),sample({eventId:'syn_003',writeState:'unknown'}),sample({eventId:'syn_004',routeOwnerId:null}),sample({eventId:'syn_005',replyBasis:'denied'}),sample({eventId:'syn_006',writeState:'confirmed',ownerId:'owner_demo',ownerAcknowledged:true})];
